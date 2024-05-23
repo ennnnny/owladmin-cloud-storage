@@ -30,7 +30,10 @@ class CloudUploadService
     public function store(array $data):void
     {
         if(!empty($data)) {
-            $title = isset($data['path']) ?  getFileName($data['path']) : 'no_pic.png';
+            $arr1 = explode(".", $data['path']);
+            $length1 = count($arr1);
+            $arr2 = explode("/",$arr1[0]);
+            $title = end($arr2);
             //需要转换
             $type = isset($data['path']) ?  getAccept($data['path']) : 'other';
             $cloudResourceService = new CloudResourceService();
@@ -40,7 +43,7 @@ class CloudUploadService
                 'url'       =>  $data['path'],
                 'is_type'   =>  array_flip($cloudResourceService::fileType)[$type],
                 'storage_id'=>  $cloudResourceService->getStorageId(),
-                'extension' => $data['extension'] ?? CloudStorageServiceProvider::instance()->getName(),
+                'extension' =>  $arr1[$length1 - 1] ?? null,
             ]);
         }
     }

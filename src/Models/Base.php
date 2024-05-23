@@ -24,6 +24,17 @@ class Base extends Model
         );
     }
 
+    public function url(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? [
+                'path' => $value,
+                'value'  => $this->getCloudStoragePath($value)
+            ] : [],
+            set: fn($value) => $value
+        );
+    }
+
     /**
      * 获取加密链接
      * @throws \Exception

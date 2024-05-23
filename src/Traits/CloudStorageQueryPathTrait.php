@@ -44,4 +44,19 @@ trait CloudStorageQueryPathTrait
     {
         return admin_url('get/cloud_storage/resource/getList');
     }
+
+    public function updateResourcePath(): string
+    {
+        return admin_url('cloud_storage/resource/${id}');
+    }
+
+    public function deleteResourcePath(): string
+    {
+        return 'delete:'.admin_url('cloud_storage/resource/${id}');
+    }
+
+    public function downloadResourcePath(): string
+    {
+        return admin_url('cloud_storage/resource/download/${id}');
+    }
 }

@@ -2,8 +2,13 @@
 
 namespace Slowlyo\CloudStorage\Http\Controllers;
 
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Slowlyo\CloudStorage\Services\CloudResourceService;
 use Slowlyo\OwlAdmin\Renderers\Form;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class CloudResourceController extends BaseController
 {
@@ -38,15 +43,15 @@ class CloudResourceController extends BaseController
     }
 
     /**
-     * @return \Slowlyo\OwlAdmin\Renderers\Page
-     * @throws \Exception
+     * 页面css
+     * @return array[]
      */
-    public function page(): \Slowlyo\OwlAdmin\Renderers\Page
+    private function pageCss(string $type = 'page'): array
     {
-        $cloudResourceService = new CloudResourceService();
-        return amis()->Page()->body(
-            amis()->Flex()->items([
-                amis()->Page()->css([
+        $data = array();
+        switch ($type) {
+            case 'page':
+                $data = [
                     '.nav-type > .cxd-Nav-Menu-submenu-title > .cxd-Nav-Menu-item-wrap > .cxd-Nav-Menu-item-link .nav-icon-img > .cxd-Nav-Menu-item-wrap > .cxd-Nav-Menu-item-link' => [
                         'display' => 'flex',
                         'align-items' => 'center',
@@ -65,7 +70,90 @@ class CloudResourceController extends BaseController
                     '.nav-icon-img:hover' => [
                         'background' => 'var(--colors-brand-10)',
                     ],
-                ])->className('w-1/5 mr-5')->body([
+                ];
+                break;
+            case 'view':
+                $data = [
+                    '.card-group-page-left' => [
+                        'padding-top' => '20px',
+                        'margin-left' => '12px',
+                        'padding-bottom' => '8px',
+                    ],
+                    '.card-group-page-right > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body' => [
+                        'padding-top' =>'20px',
+                        'display' => 'flex',
+                        'padding-bottom' => '8px',
+                    ],
+                    '.card-group-page-right > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body > .cxd-Form-item' => [
+                        'margin-bottom' => '0',
+                    ]
+                ];
+                break;
+            case 'card':
+                $data = [
+                    '.card-list:hover' => [
+                        'background' => 'var(--colors-brand-10)',
+                    ],
+                    '.card-list > .cxd-Card-heading' => [
+                        'padding' => '0',
+                        'display' => 'inline-block',
+                        'position' => 'absolute',
+                        'z-index' => '99',
+                    ],
+                    '.card-list > .cxd-Card-heading > .cxd-Card-toolbar' => [
+                        'margin-left' => '0',
+                        'text-align' => 'left',
+                    ],
+                    '.card-list > .cxd-Card-body' => [
+                        'padding' => '0',
+                    ],
+                    '.card-list > .cxd-Card-body > .cxd-Card-field > .cxd-Card-fieldValue > .cxd-ImageField' => [
+                        'display' => 'flex',
+                        'justify-content' => 'center'
+                    ],
+                    '.card-list > .cxd-Card-body > .cxd-Card-field > .cxd-Card-fieldValue > .cxd-Page > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body' => [
+                        'display' => 'flex',
+                        'flex' => '1',
+                        'align-items' => 'center'
+                    ],
+                    '.card-list-text > .cxd-Page-content > .cxd-Page-main' => [
+                        'width'  => '100%',
+                    ],
+                    '.card-list-text > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body > .cxd-TplField > span' => [
+                        'width'  => '100%',
+                        'display' => 'block',
+                        'overflow' => 'hidden',
+                        'white-space' => 'nowrap',
+                        'text-overflow' => 'ellipsis'
+                    ],
+                    '.card-list > .cxd-Card-heading > .cxd-Card-toolbar > .cxd-Checkbox' => [
+                        'padding-left' => '10px'
+                    ],
+                    '.card-link > .cxd-Button' => [
+                        'padding' => '0',
+                    ],
+                    '.card-list > .cxd-Card-body > .cxd-Card-field > .cxd-Card-fieldValue > .cxd-ImageField > .cxd-Image' => [
+                        'width' => '9em',
+                        'height' => '9em',
+                        'display' => 'flex',
+                        'align-items' => 'center'
+                    ]
+                ];
+                break;
+        }
+        return $data;
+    }
+
+    /**
+     * @return \Slowlyo\OwlAdmin\Renderers\Page
+     * @throws \Exception
+     */
+    public function page(): \Slowlyo\OwlAdmin\Renderers\Page
+    {
+        $cloudResourceService = new CloudResourceService();
+        return amis()->Page()->body(
+            amis()->Flex()->items([
+                amis()->Page()->css($this->pageCss('page'))->className('w-1/5 mr-5')->body([
                     amis()->Card()->body([
                         amis()->Page()->title(cloud_storage_trans('resource_manage'))->css([
                             '.cxd-Page-header' => [
@@ -103,47 +191,7 @@ class CloudResourceController extends BaseController
                                 'width' => '105% !important',
                             ]
                         ])->body(
-                            amis()->Chart()->className('chart-box')->height('160px')->config([
-                                'grid'            => [
-                                    'left'   =>  0,
-                                    'right'  =>  0,
-                                    'top'    =>  0,
-                                    'bottom' =>  0,
-                                ],
-                                'tooltip'         => ['show'=> true,'formatter'=> 'function (params) {console.log(params.data);return `总计：${params.data.value}<br>${params.data.name}:${params.data.size}`}'],
-                                'legend'          => [
-                                    'show'   => true,
-                                    'bottom' => -5,
-                                    'icon'   => 'circle',
-                                    'itemWidth' => 6,
-                                    'itemHeight'=> 6,
-                                    'left'=> 'center',
-                                    'textStyle' => [
-                                        'fontSize' => '8px',
-                                    ]
-                                ],
-                                'series'          => [
-                                    [
-                                        'type'              => 'pie',
-                                        'radius'            => ['40%', '70%'],
-                                        'avoidLabelOverlap' => false,
-                                        'label'             => [
-                                            'show'         => false,
-                                            'position'     => 'center',
-                                        ],
-                                        'emphasis'          => [
-                                            'label'         => [
-                                                'show'         => true,
-                                            ]
-                                        ],
-                                        'labelLine'         => [
-                                            'show'         => false,
-                                        ],
-                                        'itemStyle'         => ['borderRadius' =>  2,'borderColor' => '#fff', 'borderWidth' => 2],
-                                        'data'              => $cloudResourceService->getReport(),
-                                    ],
-                                ],
-                            ])
+                            $this->chart($cloudResourceService)
                         )
                     ]),
                 ]),
@@ -153,26 +201,62 @@ class CloudResourceController extends BaseController
     }
 
     /**
+     * 圆饼
+     * @param $cloudResourceService
+     * @return \Slowlyo\OwlAdmin\Renderers\Chart
+     */
+    private function chart($cloudResourceService): \Slowlyo\OwlAdmin\Renderers\Chart
+    {
+        return amis()->Chart()->className('chart-box')->height('160px')->config([
+            'grid'            => [
+                'left'   =>  0,
+                'right'  =>  0,
+                'top'    =>  0,
+                'bottom' =>  0,
+            ],
+            'tooltip'         => ['show'=> true,'formatter'=> 'function (params) {console.log(params.data);return `总计：${params.data.value}<br>${params.data.name}:${params.data.size}`}'],
+            'legend'          => [
+                'show'   => true,
+                'bottom' => -5,
+                'icon'   => 'circle',
+                'itemWidth' => 6,
+                'itemHeight'=> 6,
+                'left'=> 'center',
+                'textStyle' => [
+                    'fontSize' => '8px',
+                ]
+            ],
+            'series'          => [
+                [
+                    'type'              => 'pie',
+                    'radius'            => ['40%', '70%'],
+                    'avoidLabelOverlap' => false,
+                    'label'             => [
+                        'show'         => false,
+                        'position'     => 'center',
+                    ],
+                    'emphasis'          => [
+                        'label'         => [
+                            'show'         => true,
+                        ]
+                    ],
+                    'labelLine'         => [
+                        'show'         => false,
+                    ],
+                    'itemStyle'         => ['borderRadius' =>  2,'borderColor' => '#fff', 'borderWidth' => 2],
+                    'data'              => $cloudResourceService->getReport(),
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * @throws \Exception
      */
     public function view(): \Slowlyo\OwlAdmin\Renderers\Page
     {
         $cloudResourceService = new CloudResourceService();
-        return amis()->Page()->data(['showType'=>'grid','defaultKey'=>'1'])->css([
-            '.card-group-page-left' => [
-                'padding-top' => '20px',
-                'margin-left' => '12px',
-                'padding-bottom' => '8px',
-            ],
-            '.card-group-page-right > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body' => [
-                'padding-top' =>'20px',
-                'display' => 'flex',
-                'padding-bottom' => '8px',
-            ],
-            '.card-group-page-right > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body > .cxd-Form-item' => [
-                'margin-bottom' => '0',
-            ]
-        ])->body([
+        return amis()->Page()->data(['showType'=>'grid','defaultKey'=>'1'])->css($this->pageCss('view'))->body([
             amis()->Flex()->className('bg-white')->items([
                 amis()->Page()->id('tabs-list')->className('card-group-page-left w-12')->body([
                     amis()->VanillaAction()->visibleOn('${showType == "grid"}')->icon('fa fa-list')->tooltip(cloud_storage_trans('list'))->tooltipPlacement('top')->onEvent(['click' => ['actions' => [
@@ -215,8 +299,8 @@ class CloudResourceController extends BaseController
                                     ->startChunkApi($this->getUploadStartChunkPath())
                                     ->chunkApi($this->getUploadChunkPath())
                                     ->finishChunkApi($this->getUploadFinishChunkPath())
-                            ],'actions' => []
-                        ]),
+                            ]
+                        ])->reload('window'),
                     amis()->TextControl()->name('text')->size('lg')->className('card-group-page-left-search')->labelWidth('0px')->mode('horizontal')->addOn(
                         amis()->VanillaAction()->actionType('submit')
                             ->icon('fas fa-search')->label(cloud_storage_trans('query'))->level('primary')
@@ -230,135 +314,161 @@ class CloudResourceController extends BaseController
             ])->body(
                 amis()->Tabs()->id('tabs-page')->className('tabs-view')->activeKey('${activeKey|toInt}')->defaultKey('${defaultKey|toInt}')->tabs([
                     // 表格视图
-                    amis()->Tab()->className('table-view')->body([
-                        amis()->CRUDTable()
-                            ->perPage(20)
-                            ->affixHeader(false)
-                            ->filterTogglable()
-                            ->filterDefaultVisible(true)
-                            ->api($this->getResourceListPath())
-                            ->bulkActions([$this->bulkDeleteButton()])
-                            ->perPageAvailable([10, 20, 30, 50, 100, 200])
-                            ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
-                            ->columns([
-                                amis()->TableColumn('title', cloud_storage_trans('title')),
-                                amis()->TableColumn('size', cloud_storage_trans('file_size')),
-                                amis()->TableColumn('is_type', cloud_storage_trans('is_type'))->type('mapping')->map([
-                                    0 => "<span class='label label-info'>图片</span>",
-                                    1 => "<span class='label label-success'>文档</span>",
-                                    2 => "<span class='label label-danger'>视频</span>",
-                                    3 => "<span class='label label-warning'>音频</span>",
-                                    4 => "<span class='label label-default'>其他</span>"
-                                ]),
-                                $this->rowActions([
-                                    $this->rowDeleteButton(true),
-                                ])
-                            ]),
-                    ]),
+                    amis()->Tab()->className('table-view')->body(
+                        $this->CRUDTablePage()
+                    ),
                     // 卡片视图
-                    amis()->Tab()->body([
-                        amis()->CRUDCards()
-                            ->perPage(40)
-                            ->affixHeader(false)
-                            ->filterTogglable()
-                            ->filterDefaultVisible(true)
-                            ->api($this->getResourceListPath())
-                            ->bulkActions([$this->bulkDeleteButton()])
-                            ->set('columnsCount', 8)
-                            ->perPageAvailable([40, 80, 120, 160, 200, 240])
-                            ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
-                            ->card(
-                                amis()->Page()->css([
-                                    '.card-list:hover' => [
-                                        'background' => 'var(--colors-brand-10)',
-                                    ],
-                                    '.card-list > .cxd-Card-heading' => [
-                                        'padding' => '0',
-                                        'display' => 'inline-block',
-                                        'position' => 'absolute',
-                                        'z-index' => '99',
-                                    ],
-                                    '.card-list > .cxd-Card-heading > .cxd-Card-toolbar' => [
-                                        'margin-left' => '0',
-                                        'text-align' => 'left',
-                                    ],
-                                    '.card-list > .cxd-Card-body' => [
-                                        'padding' => '0',
-                                    ],
-                                    '.card-list > .cxd-Card-body > .cxd-Card-field > .cxd-Card-fieldValue > .cxd-ImageField' => [
-                                        'display' => 'flex',
-                                        'justify-content' => 'center'
-                                    ],
-                                    '.card-list > .cxd-Card-body > .cxd-Card-field > .cxd-Card-fieldValue > .cxd-Page > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body' => [
-                                        'display' => 'flex',
-                                        'flex' => '1',
-                                        'align-items' => 'center'
-                                    ],
-                                    '.card-list-text > .cxd-Page-content > .cxd-Page-main' => [
-                                        'width'  => '100%',
-                                    ],
-                                    '.card-list-text > .cxd-Page-content > .cxd-Page-main > .cxd-Page-body > .cxd-TplField > span' => [
-                                        'width'  => '100%',
-                                        'display' => 'block',
-                                        'overflow' => 'hidden',
-                                        'white-space' => 'nowrap',
-                                        'text-overflow' => 'ellipsis'
-                                    ],
-                                    '.card-list > .cxd-Card-heading > .cxd-Card-toolbar > .cxd-Checkbox' => [
-                                        'padding-left' => '10px'
-                                    ],
-                                    '.card-link > .cxd-Button' => [
-                                        'padding' => '0',
-                                    ]
-                                ])->body(
-                                    amis()->Card()->className('card-list')->body([
-                                        amis()->Image()->visibleOn('${is_type == "other"}')->src($cloudResourceService->getIcon('other')),
-                                        amis()->Image()->visibleOn('${is_type == "image"}')->name('url')->thumbRatio("16:9")->enlargeAble(true),
-                                        amis()->Image()->visibleOn('${is_type == "document"}')->src($cloudResourceService->getIcon('document')),
-                                        amis()->Image()->visibleOn('${is_type == "video"}')->src($cloudResourceService->getIcon('video')),
-                                        amis()->Image()->visibleOn('${is_type == "audio"}')->src($cloudResourceService->getIcon('audio')),
-                                        amis()->Flex()->className('flex-1')->justify('center')->alignItems('center')->items([
-                                            amis()->Page()->className('flex-auto card-list-text ml-2 text-xs w-1/4 pr-2')->body('${title}'),
-//                                            amis()->DropdownButton()->className('card-link mr-1')->level('link')->icon('fa fa-ellipsis-h')->hideCaret('1')->buttons([
-//                                                amis()->VanillaAction()->label(cloud_storage_trans('rename'))->actionType('dialog')->dialog(['title'=> cloud_storage_trans('rename'),'body' => amis()->Page()->body(
-//                                                    amis()->TextControl('title', cloud_storage_trans('title'))->required(),
-//                                                ),'actions'=> [
-//                                                    [
-//                                                        "type"       => "button",
-//                                                        "actionType" => "close",
-//                                                        "label"      => "关闭"
-//                                                    ],
-//                                                    [
-//                                                        'actionType' => 'ajax',
-//                                                        'label'      => '确定',
-//                                                        'primary'    => true,
-//                                                        'type'       => 'button',
-//                                                        'api'        => $this->getUpdatePath(),
-//                                                        'data'       => ['title'=>'${title}']
-//                                                    ]
-//                                                ]])->closeOnEsc(true),
-//                                                amis()->VanillaAction()->label(cloud_storage_trans('detail'))->actionType('dialog')->dialog(['title'=> cloud_storage_trans('detail'),'body' => amis()->Page()->body([
-//                                                    amis()->Image()->name('img')->thumbMode('w-full')->static(),
-//                                                    amis()->TextControl('title', cloud_storage_trans('title'))->static(),
-//                                                    amis()->TextControl('size', cloud_storage_trans('file_size'))->static(),
-//                                                    amis()->TextControl('created_at', __('admin.created_at'))->static(),
-//                                                    amis()->TextControl('updated_at', __('admin.updated_at'))->static(),
-//                                                ]),'actions'=>[]]),
-//                                                amis()->VanillaAction()->label(cloud_storage_trans('download'))->actionType('download')->api('${img}')->header([
-//                                                    'Access-Control-Expose-Headers' =>  'Content-Disposition'
-//                                                ]),
-//                                                amis()->VanillaAction()->label(cloud_storage_trans('delete'))->actionType('ajax')->api($this->getBulkDeletePath())
-//                                                    ->label(__('admin.delete'))
-//                                                    ->confirmText(__('admin.confirm_delete'))
-//                                            ])
-                                        ]),
-                                    ])
-                                )
-                            ),
-                    ]),
+                    amis()->Tab()->body(
+                        $this->CRUDCardsPage()
+                    ),
                 ])
             )
         ]);
+    }
+
+    /**
+     * @return \Slowlyo\OwlAdmin\Renderers\CRUDTable
+     */
+    private function CRUDTablePage(): \Slowlyo\OwlAdmin\Renderers\CRUDTable
+    {
+        return amis()->CRUDTable()
+            ->perPage(20)
+            ->affixHeader(false)
+            ->filterTogglable()
+            ->filterDefaultVisible(true)
+            ->api($this->getResourceListPath())
+            ->bulkActions([$this->bulkDeleteButton()])
+            ->perPageAvailable([10, 20, 30, 50, 100, 200])
+            ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
+            ->columns([
+                amis()->TableColumn('title', cloud_storage_trans('title')),
+                amis()->TableColumn('size', cloud_storage_trans('file_size')),
+                amis()->TableColumn('is_type', cloud_storage_trans('is_type'))->type('mapping')->map([
+                    0 => "<span class='label label-info'>图片</span>",
+                    1 => "<span class='label label-success'>文档</span>",
+                    2 => "<span class='label label-danger'>视频</span>",
+                    3 => "<span class='label label-warning'>音频</span>",
+                    4 => "<span class='label label-default'>其他</span>"
+                ]),
+                $this->rowActions([
+                    $this->rowDeleteButton(true),
+                ])
+            ]);
+    }
+
+
+    private function CRUDCardsPage(): \Slowlyo\OwlAdmin\Renderers\CRUDCards
+    {
+        $cloudResourceService = new CloudResourceService();
+        return amis()->CRUDCards()
+            ->perPage(40)
+            ->affixHeader(false)
+            ->filterTogglable()
+            ->filterDefaultVisible(true)
+            ->api($this->getResourceListPath())
+            ->bulkActions([$this->bulkDeleteButton()])
+            ->set('columnsCount', 8)
+            ->perPageAvailable([40, 80, 120, 160, 200, 240])
+            ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
+            ->card(
+                amis()->Page()->css($this->pageCss('card'))->body(
+                    amis()->Card()->className('card-list')->body([
+                        amis()->Image()->visibleOn('${is_type == "other"}')->src($cloudResourceService->getIcon('/image/file-type/other.png')),
+                        amis()->Image()->visibleOn('${is_type == "image"}')->name('url.value')->thumbRatio("16:9")->enlargeAble(true),
+                        amis()->Image()->visibleOn('${is_type == "document"}')->src($cloudResourceService->getIcon('/image/file-type/document.png'))->onEvent(['click' => ['actions' => [
+                                        [
+                                            'actionType' => 'dialog','dialog' => [
+                                            'title' => cloud_storage_trans('file_preview'),
+                                            'body' => amis()->Page()->body([
+                                                amis()->Page()->visibleOn('${event.data.extension == "pdf"}')->body(
+                                                    amis('pdf-viewer')->id('pdf-viewer')->src('${event.data.url.value}')->width('450'),
+                                                ),
+                                                amis()->Page()->visibleOn('${event.data.extension == "docx" || event.data.extension == "xlsx" || event.data.extension == "csv" || event.data.extension == "tsv"}')->body(
+                                                    amis('office-viewer')->id('office-viewer-page')->wordOptions([
+                                                        "page" => true
+                                                    ])->src('${event.data.url.value}')->width('450')
+                                                ),
+                                            ])
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ]),
+                        amis()->Image()->visibleOn('${is_type == "video"}')->src($cloudResourceService->getIcon('/image/file-type/video.png'))->onEvent(['click' => ['actions' => [
+                                    [
+                                        'actionType' => 'dialog','dialog' => [
+                                            'title' => cloud_storage_trans('video_play'),
+                                            'body' => amis()->Page()->body(
+                                                amis()->Video()->src('${event.data.url.value}')->autoPlay(true)
+                                            )
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ]),
+                        amis()->Image()->visibleOn('${is_type == "audio"}')->src($cloudResourceService->getIcon('/image/file-type/audio.png')),
+                        amis()->Flex()->className('flex-1')->justify('center')->alignItems('center')->items([
+                            amis()->Page()->className('flex-auto card-list-text ml-2 text-xs w-1/4 pr-2')->body('${title}'),
+                            amis()->DropdownButton()->className('card-link mr-1')->level('link')->icon('fa fa-ellipsis-h')->hideCaret('1')->buttons([
+                                amis()->VanillaAction()->label(cloud_storage_trans('rename'))->actionType('dialog')->dialog(['title'=> cloud_storage_trans('rename'),'body' => amis()->Page()->body(
+                                    amis()->TextareaControl('title', cloud_storage_trans('title'))->required(),
+                                ),'actions'=> [
+                                    [
+                                        "type"       => "button",
+                                        "actionType" => 'close',
+                                        "label"      => cloud_storage_trans('close')
+                                    ],
+                                    [
+                                        'actionType' => 'ajax',
+                                        'label'      => cloud_storage_trans('confirm'),
+                                        'primary'    => true,
+                                        'type'       => 'button',
+                                        'api'        => [
+                                            'url'    => $this->updateResourcePath(),
+                                            'method' => 'PUT',
+                                            'data' => [
+                                                'id'    => '${id}',
+                                                'title' => '${title}'
+                                            ],
+                                            'messages' => [
+                                                'success' => __('admin.save_success'),
+                                                'failed'  => __('admin.save_failed')
+                                            ]
+                                        ],
+                                        'close'      => true
+                                    ],
+                                ]])->closeOnEsc(true),
+                                amis()->VanillaAction()->label(cloud_storage_trans('detail'))->actionType('dialog')->dialog(['title'=> cloud_storage_trans('detail'),'body' => amis()->Page()->body([
+                                    amis()->Image()->visibleOn('${is_type == "other"}')->src($cloudResourceService->getIcon('/image/file-type/other.png')),
+                                    amis()->Image()->visibleOn('${is_type == "image"}')->name('url.value')->thumbRatio("16:9")->enlargeAble(true),
+                                    amis()->Image()->visibleOn('${is_type == "document"}')->src($cloudResourceService->getIcon('/image/file-type/document.png')),
+                                    amis()->Image()->visibleOn('${is_type == "video"}')->src($cloudResourceService->getIcon('/image/file-type/video.png')),
+                                    amis()->Image()->visibleOn('${is_type == "audio"}')->src($cloudResourceService->getIcon('/image/file-type/audio.png')),
+                                    amis()->TextControl('title', cloud_storage_trans('title'))->static(),
+                                    amis()->TextControl('size', cloud_storage_trans('file_size'))->static(),
+                                    amis()->TextControl('created_at', __('admin.created_at'))->static(),
+                                    amis()->TextControl('updated_at', __('admin.updated_at'))->static(),
+                                ]),'actions'=>[]]),
+//                                amis()->VanillaAction()->label(cloud_storage_trans('download'))->actionType('download')->api($this->downloadResourcePath()),
+                                amis()->DialogAction()->label(__('admin.delete'))->dialog(
+                                    amis()->Dialog()
+                                        ->title(__('admin.delete'))
+                                        ->className('py-2')
+                                        ->actions([
+                                            amis()->Action()->actionType('cancel')->label(__('admin.cancel')),
+                                            amis()->Action()->actionType('submit')->label(__('admin.delete'))->level('danger'),
+                                        ])
+                                        ->body([
+                                            amis()->Form()->wrapWithPanel(false)->api($this->deleteResourcePath())->body([
+                                                amis()->Tpl()->className('py-2')->tpl(__('admin.confirm_delete')),
+                                            ]),
+                                        ])
+                                )
+                            ])
+                        ]),
+                    ])
+                )
+            );
     }
 
     public function getList(): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
@@ -370,6 +480,28 @@ class CloudResourceController extends BaseController
     public function form($isEdit = false): Form
     {
         return $this->baseForm()->body([]);
+    }
+
+
+    public function download($id)
+    {
+
+        $cloudResourceService = new CloudResourceService();
+        $detail = $cloudResourceService->getDetail($id);
+        if(empty($detail)) {
+            return $this->response()->fail(cloud_storage_trans('download_failed'));
+        }
+//        // 设置响应头
+//        $headers = [
+//            'Content-Type' => Storage::disk('public')->mimeType($detail->url['path']),
+//            'Content-Disposition' => 'attachment; filename="'.urlencode($detail->title).'.'.$detail->extension.'"',
+//        ];
+        return $this->response()->success($detail);
+        // 返回文件作为响应
+//        return Response::make($detail->url, 200, $headers);
+//        return response()->download($detail->url['value'], $detail->title, [
+//            'Content-Disposition' => 'attachment; filename="'.$detail->title.'"'
+//        ]);
     }
 
 }

@@ -36,10 +36,11 @@ class Client
     public function receiver(string $object,string $filePath): array
     {
         try {
-            $this->disk->put($this->chunkDir.$object, file_get_contents($filePath));
+            $key = $this->chunkDir.$object;
+            $this->disk->put($key, file_get_contents($filePath));
             // 请求成功
-            $path = $this->signUrl($object);
-            return array('value' => $path,'path' => $object);
+            $path = $this->signUrl($key);
+            return array('value' => $path,'path' => $key);
         } catch (\Exception $e) {
             // 请求失败
             throw new \Exception($e->getMessage());
@@ -123,8 +124,8 @@ class Client
             }
             // 合并分片文件
             // 例如，使用临时文件或流来合并所有分片
-            $filePath = storage_path('app/public').$this->chunkDir;
-            $file = $filePath.$object;
+            $filePath = storage_path('app/public');
+            $file = $filePath.$this->chunkDir.$object;
             if (!file_exists($file)) {
                 $this->disk->put($this->chunkDir.$object,'');
                 $handle = fopen($file, 'wb');
@@ -138,9 +139,9 @@ class Client
                 fclose($handle);
             }
             // 返回是否成功创建最终文件
-            $path = $this->signUrl($object);
+            $path = $this->signUrl($this->chunkDir.$object);
             // 请求成功
-            return array('value' => $path,'path' => $object);
+            return array('value' => $path,'path' => $this->chunkDir.$object);
         }catch (\Exception $e) {
             // 请求失败
             throw new \Exception($e->getMessage());
@@ -196,7 +197,7 @@ class Client
     public function signUrl(string $object ,string $accessMode = 'inline'):string
     {
         try{
-            return $this->config['domain'] ? $this->config['domain'].'/storage/local/'.$object : asset('storage/local/'.$object);
+            return $this->config['domain'] ? $this->config['domain'].'/storage'.$object : asset('storage'.$object);
         }catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

@@ -2,8 +2,6 @@
 
 namespace Slowlyo\CloudStorage\Factory\CloudStorage\COS;
 
-use AlibabaCloud\Cassandra\V20190101\DeleteDataCenter;
-use OSS\Http\RequestCore_Exception;
 use Qcloud\Cos\Client as COSClient;
 
 class Client
@@ -24,7 +22,8 @@ class Client
             "credentials"   => array(
                 'secretId'  => $this->config['secret_id'],
                 'secretKey' => $this->config['secret_key'],
-            )
+            ),
+            "domain"        => $this->config['domain'] ?? null,
         );
         $this->cosClient = new COSClient($config);
     }
