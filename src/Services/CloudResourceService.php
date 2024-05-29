@@ -175,6 +175,12 @@ class CloudResourceService extends AdminService
         return $size?formatBytes($size): '0';
     }
 
+    public function getCount(int $isType = 0): int
+    {
+        $count = $this->count($isType);
+        return $count??'0';
+    }
+
     public function count(int $isType = 0)
     {
         return $this->query()

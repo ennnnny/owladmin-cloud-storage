@@ -2,13 +2,8 @@
 
 namespace Slowlyo\CloudStorage\Http\Controllers;
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Slowlyo\CloudStorage\Services\CloudResourceService;
 use Slowlyo\OwlAdmin\Renderers\Form;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 
 class CloudResourceController extends BaseController
 {
@@ -181,7 +176,7 @@ class CloudResourceController extends BaseController
                             amis()->Divider()->className('m-auto')->direction('vertical'),
                             amis()->Page()->body([
                                 amis()->Page()->bodyClassName('m-auto')->body(cloud_storage_trans('quantity')),
-                                amis()->Page()->bodyClassName('m-auto p-0.5 text-xl text-purple-600')->body($cloudResourceService->count()),
+                                amis()->Page()->bodyClassName('m-auto p-0.5 text-xl text-purple-600')->body($cloudResourceService->getCount()),
                             ]),
                         ]),
                         amis()->Divider(),

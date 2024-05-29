@@ -3,11 +3,14 @@
 namespace Slowlyo\CloudStorage\Http\Controllers;
 
 use Slowlyo\CloudStorage\Services\CloudStorageService;
+use Slowlyo\CloudStorage\Traits\UploadPickerTrait;
 use Slowlyo\OwlAdmin\Renderers\Form;
 use Slowlyo\OwlAdmin\Renderers\Page;
 
 class CloudStorageController extends BaseController
 {
+    use UploadPickerTrait;
+
     protected string $serviceName = CloudStorageService::class;
 
     public function list(): Page
@@ -68,9 +71,10 @@ class CloudStorageController extends BaseController
     public function form($isEdit = false): Form
     {
         return $this->baseForm()->body([
+
             amis()->HiddenControl('id','ID'),
-            amis()->TextControl('title', '名称')->required(),
-            amis()->SelectControl('driver', '驱动')->disabled($isEdit)->options(
+            amis()->TextControl('title', cloud_storage_trans('title'))->required(),
+            amis()->SelectControl('driver', cloud_storage_trans('driver'))->disabled($isEdit)->options(
                 cloud_storage_trans('driver_select')
             )->value('local')->required(),
             // 本地
