@@ -96,5 +96,10 @@ return [
     'incorrect_upload_id_or_shard_index' => '错误的上传ID或分片索引',
     'incorrect_upload_id' => '错误的上传ID',
     'fragment_not_found'  => '未找到分片',
-    'unable_to_open_output_file' =>'无法打开输出文件'
+    'unable_to_open_output_file' =>'无法打开输出文件',
+    'video_play'          => '视频播放',
+    'close'               => '关闭',
+    'confirm'             => '确定',
+    'file_preview'        => '文件预览',
+    'download_failed'     => '下载失败'
 ];

@@ -21,6 +21,55 @@ class CloudResourceService extends AdminService
     ];
 
     /**
+     * @param $data
+     * @param array $columns
+     * @param CloudResource $model
+     * @return int
+     * @throws \Exception
+     */
+    protected function saveData($data, array $columns, CloudResource $model): int
+    {
+        foreach ($data as $k => $v) {
+            if (!in_array($k, $columns)) {
+                continue;
+            }
+            $model->setAttribute($k, $v);
+        }
+        return $model->save();
+    }
+
+    /**
+     * 更新数据
+     * @param $primaryKey
+     * @param $data
+     * @return bool
+     * @throws \Exception
+     */
+    public function update($primaryKey, $data): bool
+    {
+        $columns = $this->getTableColumns();
+
+        $model = $this->query()->whereKey($primaryKey)->first();
+
+        return $this->saveData($data, $columns, $model);
+    }
+
+    /**
+     * 插入数据
+     * @param $data
+     * @return bool
+     * @throws \Exception
+     */
+    public function store($data): bool
+    {
+        $columns = $this->getTableColumns();
+
+        $model = $this->getModel();
+
+        return $this->saveData($data, $columns, $model);
+    }
+
+    /**
      * @throws \Exception
      */
     public function getDefaultQuery(): object
@@ -42,7 +91,7 @@ class CloudResourceService extends AdminService
                 $query->where('title', 'like', "%{$keyword}%");
             })->when(!empty($isType), function ($query) use ($isType) {
                 $query->where('is_type', $isType);
-            });
+            })->orderBy('id','desc');
 
         $items = (clone $query)->paginate(request()->input('perPage', 40))->items();
         $total = (clone $query)->count();

@@ -11,6 +11,8 @@ Route::resource('cloud_storage/storage',Controllers\CloudStorageController::clas
 Route::resource('cloud_storage/resource',Controllers\CloudResourceController::class);
 // 获取单纯列表数据
 Route::get('get/cloud_storage/resource/getList', [Controllers\CloudResourceController::class, 'getList']);
+// 下载
+Route::get('cloud_storage/resource/download/{id}', [Controllers\CloudResourceController::class, 'download']);
 // 简单上传
 Route::post('cloud_storage/upload/receiver', [Controllers\CloudUploadController::class, 'receiver']);
 // 切片上传

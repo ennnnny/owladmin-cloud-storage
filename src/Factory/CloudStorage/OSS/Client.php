@@ -3,7 +3,6 @@
 namespace Slowlyo\CloudStorage\Factory\CloudStorage\OSS;
 
 use OSS\Core\OssException;
-use OSS\Core\OssUtil;
 use OSS\Credentials\Credentials;
 use OSS\Http\RequestCore_Exception;
 use OSS\OssClient;

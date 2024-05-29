@@ -75,7 +75,7 @@ class CloudStorageController extends BaseController
             )->value('local')->required(),
             // 本地
             amis()->Container()->hiddenOn('${driver!="local"}')->body([
-                amis()->TextControl('config.domain',  cloud_storage_trans('domain')),
+                amis()->TextControl('config.domain',  cloud_storage_trans('domain'))->required(),
                 amis()->TextControl('config.root', cloud_storage_trans('root'))->desc(cloud_storage_trans('root_desc'))->required(),
             ]),
             // OSS 阿里云对象存储
@@ -92,6 +92,7 @@ class CloudStorageController extends BaseController
                 amis()->TextControl('config.secret_key', cloud_storage_trans('secret_key'))->required()->type('input-password'),
                 amis()->TextControl('config.bucket', cloud_storage_trans('bucket'))->desc(cloud_storage_trans('bucket_desc'))->required(),
                 amis()->TextControl('config.region', cloud_storage_trans('region'))->desc(cloud_storage_trans('region_desc'))->required(),
+                amis()->TextControl('config.domain',  cloud_storage_trans('domain')),
             ]),
             // 七牛云存储
 //            amis()->Container()->hiddenOn('${driver!="kodo"}')->body([
@@ -107,6 +108,13 @@ class CloudStorageController extends BaseController
             amis()->TextControl('sort', cloud_storage_trans('sort'))->value(1000),
             amis()->SwitchControl('is_default', cloud_storage_trans('is_default'))->value(0),
             amis()->SwitchControl('enabled', cloud_storage_trans('status'))->value(0),
+        ])->onEvent([
+            'submitSucc' => [
+                'actions' => [
+                    'actionType' => 'custom',
+                    'script'     => 'window.$owl.refreshRoutes()',
+                ],
+            ],
         ]);
     }
 
