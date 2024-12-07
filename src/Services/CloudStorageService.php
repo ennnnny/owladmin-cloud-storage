@@ -1,10 +1,10 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Services;
+namespace Ennnnny\CloudStorage\Services;
 
-use Slowlyo\CloudStorage\Models\Base;
+use Ennnnny\CloudStorage\Models\Base;
+use Ennnnny\CloudStorage\Models\CloudStorage;
 use Slowlyo\OwlAdmin\Services\AdminService;
-use Slowlyo\CloudStorage\Models\CloudStorage;
 
 /**
  * 存储设置
@@ -17,28 +17,23 @@ class CloudStorageService extends AdminService
     protected string $modelName = CloudStorage::class;
 
     /**
-     * @param $data
-     * @param array $columns
-     * @param CloudStorage $model
-     * @return int
      * @throws \Exception
      */
     protected function saveData($data, array $columns, CloudStorage $model): int
     {
         foreach ($data as $k => $v) {
-            if (!in_array($k, $columns)) {
+            if (! in_array($k, $columns)) {
                 continue;
             }
             $model->setAttribute($k, $v);
         }
+
         return $model->save();
     }
 
     /**
      * 更新数据
-     * @param $primaryKey
-     * @param $data
-     * @return bool
+     *
      * @throws \Exception
      */
     public function update($primaryKey, $data): bool
@@ -47,19 +42,19 @@ class CloudStorageService extends AdminService
 
         $model = $this->query()->whereKey($primaryKey)->first();
 
-        if(isset($data["is_default"]) && $data["is_default"] == 1) {
+        if (isset($data['is_default']) && $data['is_default'] == 1) {
             //要更新数据
-            if($this->query()->where(['is_default'=> Base::ENABLE,'id'=>$model->id])->count() == 0) {
-                $this->query()->update(["is_default" => Base::FORBIDDEN]);
+            if ($this->query()->where(['is_default' => Base::ENABLE, 'id' => $model->id])->count() == 0) {
+                $this->query()->update(['is_default' => Base::FORBIDDEN]);
             }
         }
+
         return $this->saveData($data, $columns, $model);
     }
 
     /**
      * 插入数据
-     * @param $data
-     * @return bool
+     *
      * @throws \Exception
      */
     public function store($data): bool
@@ -67,17 +62,19 @@ class CloudStorageService extends AdminService
         $columns = $this->getTableColumns();
 
         $model = $this->getModel();
-        if(isset($data["is_default"]) && $data["is_default"] == 1) {
+        if (isset($data['is_default']) && $data['is_default'] == 1) {
             //要更新数据
-            if($this->query()->where('is_default',Base::ENABLE)->count() == 1) {
-                $this->query()->update(["is_default" => !$data["is_default"]]);
+            if ($this->query()->where('is_default', Base::ENABLE)->count() == 1) {
+                $this->query()->update(['is_default' => ! $data['is_default']]);
             }
         }
+
         return $this->saveData($data, $columns, $model);
     }
 
     /**
      * 查询数据
+     *
      * @return array
      */
     public function list()
@@ -89,7 +86,7 @@ class CloudStorageService extends AdminService
         $enabled = request()->enabled;
 
         $query = $this->query()
-            ->when(!empty($keyword), function ($query) use ($keyword) {
+            ->when(! empty($keyword), function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%")->orWhere('description', 'like', "%{$keyword}%");
             })
             ->when(is_numeric($isDefault), function ($query) use ($isDefault) {
@@ -104,5 +101,4 @@ class CloudStorageService extends AdminService
 
         return compact('items', 'total');
     }
-
 }

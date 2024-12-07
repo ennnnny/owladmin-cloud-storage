@@ -1,12 +1,15 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Http\Controllers;
+namespace Ennnnny\CloudStorage\Http\Controllers;
 
-use Slowlyo\CloudStorage\Services\CloudStorageService;
-use Slowlyo\CloudStorage\Traits\UploadPickerTrait;
+use Ennnnny\CloudStorage\Services\CloudStorageService;
+use Ennnnny\CloudStorage\Traits\UploadPickerTrait;
 use Slowlyo\OwlAdmin\Renderers\Form;
 use Slowlyo\OwlAdmin\Renderers\Page;
 
+/**
+ * @property CloudStorageService $service
+ */
 class CloudStorageController extends BaseController
 {
     use UploadPickerTrait;
@@ -24,14 +27,14 @@ class CloudStorageController extends BaseController
                 $this->baseFilter()->body([
                     amis()->TextControl('keyword', __('admin.keyword'))
                         ->size('lg')
-                        ->placeholder("请输入关键词"),
-                    amis()->SelectControl('is_default',cloud_storage_trans('is_default'))
+                        ->placeholder('请输入关键词'),
+                    amis()->SelectControl('is_default', cloud_storage_trans('is_default'))
                         ->size('lg')
                         ->joinValues(false)
                         ->extractValue()
                         ->clearable()
                         ->options(cloud_storage_trans('is_default_select')),
-                    amis()->SelectControl('enabled',cloud_storage_trans('status'))
+                    amis()->SelectControl('enabled', cloud_storage_trans('status'))
                         ->size('lg')
                         ->joinValues(false)
                         ->extractValue()
@@ -61,25 +64,24 @@ class CloudStorageController extends BaseController
                 $this->rowActions([
                     $this->rowEditButton(true),
                     $this->rowDeleteButton(true),
-                ])
+                ]),
             ]);
 
         return $this->baseList($crud);
     }
 
-
     public function form($isEdit = false): Form
     {
         return $this->baseForm()->body([
 
-            amis()->HiddenControl('id','ID'),
+            amis()->HiddenControl('id', 'ID'),
             amis()->TextControl('title', cloud_storage_trans('title'))->required(),
             amis()->SelectControl('driver', cloud_storage_trans('driver'))->disabled($isEdit)->options(
                 cloud_storage_trans('driver_select')
             )->value('local')->required(),
             // 本地
             amis()->Container()->hiddenOn('${driver!="local"}')->body([
-                amis()->TextControl('config.domain',  cloud_storage_trans('domain'))->required(),
+                amis()->TextControl('config.domain', cloud_storage_trans('domain'))->required(),
                 amis()->TextControl('config.root', cloud_storage_trans('root'))->desc(cloud_storage_trans('root_desc'))->required(),
             ]),
             // OSS 阿里云对象存储
@@ -96,15 +98,15 @@ class CloudStorageController extends BaseController
                 amis()->TextControl('config.secret_key', cloud_storage_trans('secret_key'))->required()->type('input-password'),
                 amis()->TextControl('config.bucket', cloud_storage_trans('bucket'))->desc(cloud_storage_trans('bucket_desc'))->required(),
                 amis()->TextControl('config.region', cloud_storage_trans('region'))->desc(cloud_storage_trans('region_desc'))->required(),
-                amis()->TextControl('config.domain',  cloud_storage_trans('domain')),
+                amis()->TextControl('config.domain', cloud_storage_trans('domain')),
             ]),
             // 七牛云存储
-//            amis()->Container()->hiddenOn('${driver!="kodo"}')->body([
-//                amis()->TextControl('config.access_key', cloud_storage_trans('access_key'))->required(),
-//                amis()->TextControl('config.secret_key', cloud_storage_trans('secret_key'))->required()->type('input-password'),
-//                amis()->TextControl('config.bucket', cloud_storage_trans('bucket'))->desc(cloud_storage_trans('bucket_desc'))->required(),
-//                amis()->TextControl('config.domain',  cloud_storage_trans('domain')),
-//            ]),
+            //            amis()->Container()->hiddenOn('${driver!="kodo"}')->body([
+            //                amis()->TextControl('config.access_key', cloud_storage_trans('access_key'))->required(),
+            //                amis()->TextControl('config.secret_key', cloud_storage_trans('secret_key'))->required()->type('input-password'),
+            //                amis()->TextControl('config.bucket', cloud_storage_trans('bucket'))->desc(cloud_storage_trans('bucket_desc'))->required(),
+            //                amis()->TextControl('config.domain',  cloud_storage_trans('domain')),
+            //            ]),
             amis()->Page()->className(['m-3']),
             amis()->NumberControl('file_size', cloud_storage_trans('file_size'))->desc(cloud_storage_trans('file_size_desc')),
             amis()->TextareaControl('accept', cloud_storage_trans('accept'))->desc(cloud_storage_trans('accept_desc')),
@@ -116,7 +118,7 @@ class CloudStorageController extends BaseController
             'submitSucc' => [
                 'actions' => [
                     'actionType' => 'custom',
-                    'script'     => 'window.$owl.refreshRoutes()',
+                    'script' => 'window.$owl.refreshRoutes()',
                 ],
             ],
         ]);

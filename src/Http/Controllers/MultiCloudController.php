@@ -11,5 +11,4 @@ class MultiCloudController extends AdminController
     {
         return $this->baseDetail()->body([]);
     }
-
 }

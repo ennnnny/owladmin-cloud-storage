@@ -1,16 +1,16 @@
 {
-    "name": "szsuohong/cloud-storage",
-    "alias": "资源云存储",
-    "description": "支持 本地，七牛云，腾讯云，阿里云 OSS云存储功能，支持一键迁移，资源展示等功能。",
+    "name": "ennnnny/owladmin-cloud-storage",
+    "alias": "云存储管理",
+    "description": "支持 本地，七牛云、腾讯云、阿里云等OSS云存储功能，支持一键迁移，资源展示等功能。",
     "type": "library",
-    "version": "1.0.0",
-    "keywords": ["owl-admin", "extension"],
-    "homepage": "https://github.com/szsuohong/cloud-storage",
+    "version": "0.0.1",
+    "keywords": ["owl-admin", "extension", "oss"],
+    "homepage": "https://github.com/ennnnny/owladmin-cloud-storage",
     "license": "MIT",
     "authors": [
         {
-            "name": "kevin",
-            "email": "1129759063@qq.com"
+            "name": "ennnnny",
+            "email": "kuye1130@gmail.com"
         }
     ],
     "require": {
@@ -22,17 +22,17 @@
     },
     "autoload": {
         "psr-4": {
-            "Slowlyo\\CloudStorage\\": "src/"
+            "Ennnnny\\CloudStorage\\": "src/"
         },
         "files": [
             "src/functions.php"
         ]
     },
     "extra": {
-        "owl-admin": "Slowlyo\\CloudStorage\\CloudStorageServiceProvider",
+        "owl-admin": "Ennnnny\\CloudStorage\\CloudStorageServiceProvider",
         "laravel": {
             "providers": [
-                "Slowlyo\\CloudStorage\\MultiCloudServiceProvider"
+                "Ennnnny\\CloudStorage\\CloudStorageServiceProvider"
             ]
         }
     }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Services;
+namespace Ennnnny\CloudStorage\Services;
 
-use Slowlyo\CloudStorage\CloudStorageServiceProvider;
-use Slowlyo\CloudStorage\Models\CloudResource;
+use Ennnnny\CloudStorage\CloudStorageServiceProvider;
+use Ennnnny\CloudStorage\Models\CloudResource;
 use Slowlyo\OwlAdmin\Services\AdminService;
 
 /**
@@ -17,32 +17,27 @@ class CloudResourceService extends AdminService
     protected string $modelName = CloudResource::class;
 
     const fileType = [
-        'all','image','document','video','audio','other'
+        'all', 'image', 'document', 'video', 'audio', 'other',
     ];
 
     /**
-     * @param $data
-     * @param array $columns
-     * @param CloudResource $model
-     * @return int
      * @throws \Exception
      */
     protected function saveData($data, array $columns, CloudResource $model): int
     {
         foreach ($data as $k => $v) {
-            if (!in_array($k, $columns)) {
+            if (! in_array($k, $columns)) {
                 continue;
             }
             $model->setAttribute($k, $v);
         }
+
         return $model->save();
     }
 
     /**
      * 更新数据
-     * @param $primaryKey
-     * @param $data
-     * @return bool
+     *
      * @throws \Exception
      */
     public function update($primaryKey, $data): bool
@@ -56,8 +51,7 @@ class CloudResourceService extends AdminService
 
     /**
      * 插入数据
-     * @param $data
-     * @return bool
+     *
      * @throws \Exception
      */
     public function store($data): bool
@@ -74,12 +68,14 @@ class CloudResourceService extends AdminService
      */
     public function getDefaultQuery(): object
     {
-        $cloudStorageService = new CloudUploadService();
+        $cloudStorageService = new CloudUploadService;
+
         return $cloudStorageService->config();
     }
 
     /**
      * 查询数据
+     *
      * @return array
      */
     public function list()
@@ -87,11 +83,13 @@ class CloudResourceService extends AdminService
         $keyword = request()->keyword;
         $isType = request()->is_type;
         $query = $this->query()
-            ->when(!empty($keyword), function ($query) use ($keyword) {
+            ->when(! empty($keyword), function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%");
-            })->when(!empty($isType), function ($query) use ($isType) {
-                $query->where('is_type', $isType);
-            })->orderBy('id','desc');
+            })
+//            ->when(! empty($isType), function ($query) use ($isType) {
+//                $query->where('is_type', $isType);
+//            })
+            ->orderBy('id', 'desc');
 
         $items = (clone $query)->paginate(request()->input('perPage', 40))->items();
         $total = (clone $query)->count();
@@ -99,14 +97,14 @@ class CloudResourceService extends AdminService
         return compact('items', 'total');
     }
 
-
     /**
      * 获取文件类型
+     *
      * @throws \Exception
      */
     public function getAccept()
     {
-        return $this->getDefaultQuery()->accept ?? "*";
+        return $this->getDefaultQuery()->accept ?? '*';
     }
 
     /**
@@ -127,11 +125,12 @@ class CloudResourceService extends AdminService
 
     /**
      * 生成icon
+     *
      * @return array|array[]
      */
     public function generateIcon(): array
     {
-        $list = array();
+        $list = [];
         foreach (self::fileType as $index => $item) {
             $list[$index]['id'] = $index;
             $list[$index]['label'] = cloud_storage_trans($item);
@@ -140,60 +139,63 @@ class CloudResourceService extends AdminService
             $list[$index]['to'] = admin_url('/cloud_storage/resource?page='.request()->page.'&perPage='.request()->perPage.'&is_type='.$index);
             $list[$index]['active'] = request()->is_type == $index;
         }
+
         return $list;
     }
 
     public function getReport(): array
     {
-        $list = array();
+        $list = [];
         $i = 0;
         foreach (self::fileType as $index => $item) {
-            if($index > 0) {
+            if ($index > 0) {
                 $list[$i]['value'] = $this->count($index);
                 $list[$i]['name'] = cloud_storage_trans($item);
                 $list[$i]['size'] = $this->getSizeMemory($index);
                 $i++;
             }
         }
+
         return $list;
     }
 
     /**
      * 获取icon
-     * @param string $path
-     * @return string
      */
-    public function getIcon(string $path):string
+    public function getIcon(string $path): string
     {
         return CloudStorageServiceProvider::instance()->assetUrl($path);
     }
 
-
     public function getSizeMemory(int $isType = 0): ?string
     {
-        $size = $this->sum('size',$isType);
-        return $size?formatBytes($size): '0';
+        $size = $this->sum('size', $isType);
+
+        return $size ? formatBytes($size) : '0';
     }
 
     public function getCount(int $isType = 0): int
     {
         $count = $this->count($isType);
-        return $count??'0';
+
+        return $count ?? '0';
     }
 
     public function count(int $isType = 0)
     {
         return $this->query()
-            ->when(!empty($isType), function ($query) use ($isType) {
-                $query->where('is_type', $isType);
-            })->count();
+//            ->when(! empty($isType), function ($query) use ($isType) {
+//                $query->where('is_type', $isType);
+//            })
+            ->count();
     }
 
-    public function sum(string $key,int $isType = 0)
+    public function sum(string $key, int $isType = 0)
     {
         return $this->query()
-            ->when(!empty($isType), function ($query) use ($isType) {
-                $query->where('is_type', $isType);
-            })->sum($key);
+//            ->when(! empty($isType), function ($query) use ($isType) {
+//                $query->where('is_type', $isType);
+//            })
+            ->sum($key);
     }
 }

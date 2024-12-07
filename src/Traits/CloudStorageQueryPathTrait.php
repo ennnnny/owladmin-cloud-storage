@@ -1,12 +1,11 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Traits;
+namespace Ennnnny\CloudStorage\Traits;
 
 trait CloudStorageQueryPathTrait
 {
     /**
      * 简单上传
-     * @return string
      */
     public function getUploadReceiverPath(): string
     {
@@ -15,7 +14,6 @@ trait CloudStorageQueryPathTrait
 
     /**
      * 开始上传文件的准备
-     * @return string
      */
     public function getUploadStartChunkPath(): string
     {
@@ -24,7 +22,6 @@ trait CloudStorageQueryPathTrait
 
     /**
      * 分段上传文件
-     * @return string
      */
     public function getUploadChunkPath(): string
     {
@@ -33,7 +30,6 @@ trait CloudStorageQueryPathTrait
 
     /**
      * 完成分片上传
-     * @return string
      */
     public function getUploadFinishChunkPath(): string
     {

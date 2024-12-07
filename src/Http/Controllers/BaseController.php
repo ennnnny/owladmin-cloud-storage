@@ -1,10 +1,10 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Http\Controllers;
+namespace Ennnnny\CloudStorage\Http\Controllers;
 
+use Ennnnny\CloudStorage\Traits;
 use Slowlyo\OwlAdmin\Controllers\AdminController;
 use Slowlyo\OwlAdmin\Renderers\Form;
-use Slowlyo\CloudStorage\Traits;
 
 class BaseController extends AdminController
 {

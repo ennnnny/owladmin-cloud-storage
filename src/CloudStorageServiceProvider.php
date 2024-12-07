@@ -1,6 +1,6 @@
 <?php
 
-namespace Slowlyo\CloudStorage;
+namespace Ennnnny\CloudStorage;
 
 use Slowlyo\OwlAdmin\Extend\Extension;
 use Slowlyo\OwlAdmin\Extend\ServiceProvider;
@@ -9,50 +9,35 @@ class CloudStorageServiceProvider extends ServiceProvider
 {
     protected $menu = [
         [
-            'title'    => '资源云存储',
-            'url'      => '/cloud_storage',
+            'title' => '云存储管理',
+            'url' => '/cloud_storage',
             'url_type' => '1',
-            'icon'     => 'tdesign:object-storage',
+            'icon' => 'tdesign:object-storage',
         ],
         [
-            'parent'   => '资源云存储', // 此处父级菜单根据 title 查找
-            'title'    => '资源管理',
-            'url'      => '/cloud_storage/resource',
+            'parent' => '云存储管理', // 此处父级菜单根据 title 查找
+            'title' => '资源管理',
+            'url' => '/cloud_storage/resource',
             'url_type' => '1',
-            'icon'     => 'ant-design:file-protect-outlined',
+            'icon' => 'ant-design:file-protect-outlined',
         ],
         [
-            'parent'   => '资源云存储', // 此处父级菜单根据 title 查找
-            'title'    => '存储设置',
-            'url'      => '/cloud_storage/storage',
+            'parent' => '云存储管理', // 此处父级菜单根据 title 查找
+            'title' => '存储设置',
+            'url' => '/cloud_storage/storage',
             'url_type' => '1',
-            'icon'     => 'carbon:settings-check',
-        ]
+            'icon' => 'carbon:settings-check',
+        ],
     ];
 
-    public function install()
+    public function settingForm()
     {
-        parent::install();
-//        if(!FilesystemConfig::query()->where('key','local')->first()){
-//            FilesystemConfig::query()->insert([
-//                'name'=>'默认存储',
-//                'desc'=>'系统默认本地存储',
-//                'key'=>'local',
-//                'driver'=>'local',
-//                'config'=>json_encode([
-//                    'driver'=>'local',
-//                    'root'=>'uploads',
-//                    'throw'=>false
-//                ]),
-//                'created_at'=>date('Y-m-d H:i:s'),
-//                'updated_at'=>date('Y-m-d H:i:s'),
-//            ]);
-//        }
+        return null;
     }
 
     public function boot()
     {
-        require_once(__DIR__ . DIRECTORY_SEPARATOR . 'functions.php');
+        require_once __DIR__.DIRECTORY_SEPARATOR.'functions.php';
         if (Extension::tableExists()) {
             $this->autoRegister();
             $this->init();

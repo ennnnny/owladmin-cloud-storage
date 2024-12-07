@@ -1,17 +1,19 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Models;
+namespace Ennnnny\CloudStorage\Models;
 
+use Ennnnny\CloudStorage\Services\CloudResourceService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Slowlyo\CloudStorage\Services\CloudResourceService;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 
 class CloudResource extends Base
 {
-    protected $table = 'suohong_cloud_resource';
+    use HasUlids;
+
+    protected $table = 'admin_cloud_resource';
 
     /**
      * 钩子
-     * @return void
      */
     public static function boot(): void
     {
@@ -24,20 +26,21 @@ class CloudResource extends Base
         });
     }
 
-    public function size():Attribute
+    public function size(): Attribute
     {
         return new Attribute(
-            get: fn($value) => $value ? formatBytes($value) : 0,
-            set: fn($value) => $value,
+            get: fn ($value) => $value ? formatBytes($value) : 0,
+            set: fn ($value) => $value,
         );
     }
 
-    public function isType():Attribute
+    public function isType(): Attribute
     {
-        $cloudResourceService = new CloudResourceService();
+        $cloudResourceService = new CloudResourceService;
+
         return new Attribute(
-            get: fn($value) => $value ? $cloudResourceService::fileType[$value] : 0,
-            set: fn($value) => $value,
+            get: fn ($value) => $value ? $cloudResourceService::fileType[$value] : 0,
+            set: fn ($value) => $value,
         );
     }
 }

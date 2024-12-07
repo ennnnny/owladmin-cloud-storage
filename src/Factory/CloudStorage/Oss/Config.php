@@ -1,6 +1,6 @@
 <?php
 
-namespace Slowlyo\CloudStorage\Factory\CloudStorage\OSS;
+namespace Ennnnny\CloudStorage\Factory\CloudStorage\Oss;
 
 use OSS\Core\OssException;
 use OSS\Credentials\Credentials;
@@ -14,13 +14,14 @@ class Config implements CredentialsProvider
     {
         $this->config = $argv;
     }
+
     /**
-     * @return Credentials
      * @throws OssException
      */
     public function getCredentials(): Credentials
     {
         $token = $this->config['token'] ?? null;
+
         return new Credentials($this->config['access_key'], $this->config['secret_key'], $token);
     }
 }

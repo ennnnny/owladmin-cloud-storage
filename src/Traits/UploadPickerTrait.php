@@ -1,27 +1,28 @@
 <?php
+
 /**
  * @Author: Kevin
+ *
  * @Email: 1129759063@qq.com
+ *
  * @Date: 2024/5/29:下午2:09
  **/
 
-namespace Slowlyo\CloudStorage\Traits;
+namespace Ennnnny\CloudStorage\Traits;
 
-use Slowlyo\CloudStorage\Services\CloudResourceService;
+use Ennnnny\CloudStorage\Services\CloudResourceService;
 
 trait UploadPickerTrait
 {
     /**
      * iconify 图标选择器
      *
-     * @param string $name
-     * @param string $label
      *
      * @return \Slowlyo\OwlAdmin\Renderers\PickerControl
      */
     public function uploadPicker(string $name = '', string $label = '')
     {
-        $cloudResourceService = new CloudResourceService();
+        $cloudResourceService = new CloudResourceService;
         $schema = amis()->CRUDCards()
             ->perPage(40)
             ->set('columnsCount', 8)
@@ -31,7 +32,7 @@ trait UploadPickerTrait
                     amis()->GroupControl()->className('pt-3 pb-3')->body([
                         amis()->TextControl('query')
                             ->size('md')
-                            ->value('${' . $name . ' || "home"}')
+                            ->value('${'.$name.' || "home"}')
                             ->clearable()
                             ->required(),
                         amis()->Button()
@@ -55,7 +56,7 @@ trait UploadPickerTrait
                     amis()->Image()->visibleOn('${is_type == "document"}')->src($cloudResourceService->getIcon('/image/file-type/document.png'))->width('auto'),
                     amis()->Image()->visibleOn('${is_type == "video"}')->src($cloudResourceService->getIcon('/image/file-type/video.png'))->width('auto'),
                     amis()->Image()->visibleOn('${is_type == "audio"}')->src($cloudResourceService->getIcon('/image/file-type/audio.png'))->width('auto'),
-                    amis()->Page()->className('overflow-hidden white-space-nowrap')->body('${title}')
+                    amis()->Page()->className('overflow-hidden white-space-nowrap')->body('${title}'),
                 ])
             );
 

@@ -1,19 +1,17 @@
-## OwlAdmin 数据字典
+# Owl Admin Extension
 
-## 效果
-
-增加数据字典管理功能
+## 云存储管理
+支持 本地，七牛云、腾讯云、阿里云等OSS云存储功能，支持一键迁移，资源展示等功能。
 
 ## 安装
 
 #### zip 下载地址
 
-[https://github.com/szsuohong/cloud-storage/archive/refs/tags/v.0.1.0.zip](https://github.com/szsuohong/cloud-storage/archive/refs/tags/v.0.1.0.zip)
 
 #### composer
 
 ```bash
-composer require szsuohong/cloud-storage
+composer require ennnnny/owladmin-cloud-storage
 ```
 
 ## 使用说明
@@ -34,9 +32,10 @@ use Slowlyo\CloudStorage\Traits\UploadPickerTrait;
 class CloudResourceController extends BaseController
 {
     use UploadPickerTrait;
+    
+    // 调用方法
+    $this->uploadPicker('icon', __('admin.admin_menu.icon'));
 }
-// 调用方法
- $this->uploadPicker('icon', __('admin.admin_menu.icon')),
 ```
 ### 注意事项
 
