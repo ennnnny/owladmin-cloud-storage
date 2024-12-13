@@ -14,6 +14,8 @@ use Ennnnny\CloudStorage\Services\CloudResourceService;
 
 trait UploadPickerTrait
 {
+    use CloudStorageQueryPathTrait;
+
     /**
      * iconify 图标选择器
      *

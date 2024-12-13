@@ -14,10 +14,10 @@ class CloudUploadController extends BaseController
         $this->uploadService = new CloudUploadService;
     }
 
-    public function receiver(): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+    public function receiver($id): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
     {
         try {
-            $data = $this->uploadService->receiver();
+            $data = $this->uploadService->receiver($id);
 
             return $this->response()->success($data);
         } catch (\Exception $e) {
@@ -26,16 +26,12 @@ class CloudUploadController extends BaseController
     }
 
     /**
-     * @Desc: 开始上传文件的准备
-     *
-     * @Author: Keivn
-     *
-     * @Date: 2023/9/1 13:45
+     * 开始上传文件的准备
      */
-    public function startChunk(): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+    public function startChunk($id): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
     {
         try {
-            $data = $this->uploadService->startChunk();
+            $data = $this->uploadService->startChunk($id);
 
             return $this->response()->success($data);
         } catch (\Exception $e) {
@@ -45,16 +41,12 @@ class CloudUploadController extends BaseController
     }
 
     /**
-     * @Desc: 分段上传文件
-     *
-     * @Author: Keivn
-     *
-     * @Date: 2023/9/1 14:47
+     * 分段上传文件
      */
-    public function chunk(): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+    public function chunk($id): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
     {
         try {
-            $data = $this->uploadService->chunk();
+            $data = $this->uploadService->chunk($id);
 
             return $this->response()->success($data);
         } catch (\Exception $e) {
@@ -63,17 +55,13 @@ class CloudUploadController extends BaseController
     }
 
     /**
-     * @esc: 完成分片上传
-     *
-     * @Author: Keivn
-     *
-     * @Date: 2023/9/6 9:36
+     * 完成分片上传
      */
-    public function finishChunk(): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
+    public function finishChunk($id): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\JsonResource
     {
         try {
             //接取视频
-            $data = $this->uploadService->finishChunk();
+            $data = $this->uploadService->finishChunk($id);
 
             return $this->response()->success($data);
         } catch (\Exception $e) {

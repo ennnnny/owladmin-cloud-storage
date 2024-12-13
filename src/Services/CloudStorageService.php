@@ -16,60 +16,30 @@ class CloudStorageService extends AdminService
 {
     protected string $modelName = CloudStorage::class;
 
-    /**
-     * @throws \Exception
-     */
-    protected function saveData($data, array $columns, CloudStorage $model): int
+    public function saving(&$data, $primaryKey = '')
     {
-        foreach ($data as $k => $v) {
-            if (! in_array($k, $columns)) {
-                continue;
-            }
-            $model->setAttribute($k, $v);
+        if (filled($data)) {
+            $data['description'] = $data['description'] ?? '';
+            $data['extension'] = $data['extension'] ?? '';
         }
-
-        return $model->save();
     }
 
-    /**
-     * 更新数据
-     *
-     * @throws \Exception
-     */
-    public function update($primaryKey, $data): bool
+    public function saved($model, $isEdit = false)
     {
-        $columns = $this->getTableColumns();
-
-        $model = $this->query()->whereKey($primaryKey)->first();
-
-        if (isset($data['is_default']) && $data['is_default'] == 1) {
-            //要更新数据
-            if ($this->query()->where(['is_default' => Base::ENABLE, 'id' => $model->id])->count() == 0) {
-                $this->query()->update(['is_default' => Base::FORBIDDEN]);
-            }
+        if ($model->is_default == Base::ENABLE) {
+            $this->query()->where('id', '!=', $model->id)->update(['is_default' => Base::FORBIDDEN]);
         }
-
-        return $this->saveData($data, $columns, $model);
     }
 
-    /**
-     * 插入数据
-     *
-     * @throws \Exception
-     */
-    public function store($data): bool
+    public function getStorageOptions()
     {
-        $columns = $this->getTableColumns();
-
-        $model = $this->getModel();
-        if (isset($data['is_default']) && $data['is_default'] == 1) {
-            //要更新数据
-            if ($this->query()->where('is_default', Base::ENABLE)->count() == 1) {
-                $this->query()->update(['is_default' => ! $data['is_default']]);
-            }
+        $data = $this->query()->where('enabled', 1)->get(['id', 'title'])->toArray();
+        $res = [];
+        foreach ($data as $datum) {
+            $res[] = ['label' => $datum['title'], 'value' => $datum['id']];
         }
 
-        return $this->saveData($data, $columns, $model);
+        return $res;
     }
 
     /**
@@ -97,6 +67,27 @@ class CloudStorageService extends AdminService
             });
 
         $items = (clone $query)->paginate(request()->input('perPage', 20))->items();
+        foreach ($items as &$item) {
+            if (filled($item)) {
+                switch ($item->driver) {
+                    case 'local':
+                        $driver_str = '本地存储';
+                        break;
+                    case 'oss':
+                        $driver_str = '阿里云OSS';
+                        break;
+                    case 'cos':
+                        $driver_str = '腾讯云COS';
+                        break;
+                    case 'kodo':
+                        $driver_str = '七牛云KODO';
+                        break;
+                    default:
+                        $driver_str = '';
+                }
+                $item->setAttribute('driver_str', $driver_str);
+            }
+        }
         $total = (clone $query)->count();
 
         return compact('items', 'total');

@@ -3,6 +3,7 @@
 namespace Ennnnny\CloudStorage\Http\Controllers;
 
 use Ennnnny\CloudStorage\Services\CloudResourceService;
+use Ennnnny\CloudStorage\Services\CloudStorageService;
 use Slowlyo\OwlAdmin\Renderers\Form;
 
 /**
@@ -276,19 +277,26 @@ class CloudResourceController extends BaseController
                 ]),
                 amis()->Page()->className('card-group-page-right')->body([
                     amis()->VanillaAction()->label(cloud_storage_trans('upload'))->icon('fa fa-arrow-up-from-bracket')
-                        ->actionType('dialog')->level('primary')->dialog(['title' => '', 'body' => [
-                            amis()->FileControl('file')->labelWidth('0px')
-                                ->btnLabel(cloud_storage_trans('upload'))
-                                ->accept($this->service->getAccept())
-                                ->multiple()->drag()->mode('horizontal')
-                                ->joinValues(false)
-                                ->maxLength(env('CLOUD_STORAGE_FILE_MAX_LENGTH', 10))
-                                ->maxSize($this->service->getSize())
-                                ->receiver($this->getUploadReceiverPath())
-                                ->startChunkApi($this->getUploadStartChunkPath())
-                                ->chunkApi($this->getUploadChunkPath())
-                                ->finishChunkApi($this->getUploadFinishChunkPath()),
-                        ],
+                        ->actionType('dialog')->level('primary')->dialog([
+                            'title' => '',
+                            'body' => [
+                                amis()->SelectControl('storage_id', '存储设置')->selectFirst()
+                                    ->options(CloudStorageService::make()->getStorageOptions())->required(),
+                                amis()->FileControl('file')->labelWidth('0px')
+                                    ->btnLabel(cloud_storage_trans('upload'))
+                                    ->accept($this->service->getAccept())
+                                    ->multiple()->drag()->mode('horizontal')
+                                    ->joinValues(false)
+                                    ->maxLength(env('CLOUD_STORAGE_FILE_MAX_LENGTH', 10))
+//                                    ->maxSize($this->service->getSize())
+                                    ->autoUpload(false)
+                                    ->receiver($this->getUploadReceiverPath().'/${storage_id}')
+                                    ->startChunkApi($this->getUploadStartChunkPath().'/${storage_id}')
+                                    ->chunkApi($this->getUploadChunkPath().'/${storage_id}')
+                                    ->finishChunkApi($this->getUploadFinishChunkPath().'/${storage_id}')
+                                    ->visibleOn('${storage_id != null}'),
+                            ],
+                            'actions' => [],
                         ])->reload('window'),
                     amis()->TextControl()->name('text')->size('lg')->className('card-group-page-left-search')->labelWidth('0px')->mode('horizontal')->addOn(
                         amis()->VanillaAction()->actionType('submit')
@@ -328,16 +336,18 @@ class CloudResourceController extends BaseController
             ->footerToolbar(['switch-per-page', 'statistics', 'pagination'])
             ->columns([
                 amis()->TableColumn('title', cloud_storage_trans('title')),
+                amis()->TableColumn('extension', '后缀'),
                 amis()->TableColumn('size', cloud_storage_trans('file_size')),
                 amis()->TableColumn('is_type', cloud_storage_trans('is_type'))->type('mapping')->map([
-                    0 => "<span class='label label-info'>图片</span>",
-                    1 => "<span class='label label-success'>文档</span>",
-                    2 => "<span class='label label-danger'>视频</span>",
-                    3 => "<span class='label label-warning'>音频</span>",
-                    4 => "<span class='label label-default'>其他</span>",
+                    'image' => "<span class='label label-info'>图片</span>",
+                    'document' => "<span class='label label-success'>文档</span>",
+                    'video' => "<span class='label label-danger'>视频</span>",
+                    'audio' => "<span class='label label-warning'>音频</span>",
+                    'other' => "<span class='label label-default'>其他</span>",
                 ]),
+                amis()->TableColumn('created_at', admin_trans('admin.created_at'))->type('datetime')->sortable(),
                 $this->rowActions([
-                    $this->rowDeleteButton(true),
+                    $this->rowDeleteButton(),
                 ]),
             ]);
     }
@@ -429,6 +439,7 @@ class CloudResourceController extends BaseController
                                     amis()->Image()->visibleOn('${is_type == "video"}')->src($this->service->getIcon('/image/file-type/video.png')),
                                     amis()->Image()->visibleOn('${is_type == "audio"}')->src($this->service->getIcon('/image/file-type/audio.png')),
                                     amis()->TextControl('title', cloud_storage_trans('title'))->static(),
+                                    amis()->TextControl('extension', '后缀')->static(),
                                     amis()->TextControl('size', cloud_storage_trans('file_size'))->static(),
                                     amis()->TextControl('created_at', __('admin.created_at'))->static(),
                                     amis()->TextControl('updated_at', __('admin.updated_at'))->static(),

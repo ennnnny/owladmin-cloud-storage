@@ -36,41 +36,13 @@ class CloudResourceService extends AdminService
     }
 
     /**
-     * 更新数据
-     *
      * @throws \Exception
      */
-    public function update($primaryKey, $data): bool
-    {
-        $columns = $this->getTableColumns();
-
-        $model = $this->query()->whereKey($primaryKey)->first();
-
-        return $this->saveData($data, $columns, $model);
-    }
-
-    /**
-     * 插入数据
-     *
-     * @throws \Exception
-     */
-    public function store($data): bool
-    {
-        $columns = $this->getTableColumns();
-
-        $model = $this->getModel();
-
-        return $this->saveData($data, $columns, $model);
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function getDefaultQuery(): object
+    public function getDefaultQuery($id = null): object
     {
         $cloudStorageService = new CloudUploadService;
 
-        return $cloudStorageService->config();
+        return $cloudStorageService->config($id);
     }
 
     /**
@@ -86,9 +58,9 @@ class CloudResourceService extends AdminService
             ->when(! empty($keyword), function ($query) use ($keyword) {
                 $query->where('title', 'like', "%{$keyword}%");
             })
-//            ->when(! empty($isType), function ($query) use ($isType) {
-//                $query->where('is_type', $isType);
-//            })
+            ->when(! empty($isType), function ($query) use ($isType) {
+                $query->where('is_type', $isType);
+            })
             ->orderBy('id', 'desc');
 
         $items = (clone $query)->paginate(request()->input('perPage', 40))->items();
@@ -102,25 +74,25 @@ class CloudResourceService extends AdminService
      *
      * @throws \Exception
      */
-    public function getAccept()
+    public function getAccept($id = null)
     {
-        return $this->getDefaultQuery()->accept ?? '*';
+        return $this->getDefaultQuery($id)->accept ?? '*';
     }
 
     /**
      * @throws \Exception
      */
-    public function getSize()
+    public function getSize($id = null)
     {
-        return $this->getDefaultQuery()->file_size * 1024 * 1024 ?? null;
+        return $this->getDefaultQuery($id)->file_size ?? 0;
     }
 
     /**
      * @throws \Exception
      */
-    public function getStorageId()
+    public function getStorageId($id = null)
     {
-        return $this->getDefaultQuery()->id ?? null;
+        return $this->getDefaultQuery($id)->id ?? null;
     }
 
     /**
@@ -184,18 +156,18 @@ class CloudResourceService extends AdminService
     public function count(int $isType = 0)
     {
         return $this->query()
-//            ->when(! empty($isType), function ($query) use ($isType) {
-//                $query->where('is_type', $isType);
-//            })
+            ->when(! empty($isType), function ($query) use ($isType) {
+                $query->where('is_type', $isType);
+            })
             ->count();
     }
 
     public function sum(string $key, int $isType = 0)
     {
         return $this->query()
-//            ->when(! empty($isType), function ($query) use ($isType) {
-//                $query->where('is_type', $isType);
-//            })
+            ->when(! empty($isType), function ($query) use ($isType) {
+                $query->where('is_type', $isType);
+            })
             ->sum($key);
     }
 }

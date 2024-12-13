@@ -1,6 +1,5 @@
 <?php
 
-
 if (! function_exists('cloud_storage_trans')) {
     function cloud_storage_trans($key): array|string
     {
@@ -37,13 +36,22 @@ if (! function_exists('getAccept')) {
     {
         $arr = explode('.', $fileName);
         $ext = end($arr);
-        if (strpos(env('CLOUD_STORAGE_DOCUMENT_EXTENSION'), $ext) !== false) {
+        $ext = strtolower($ext);
+        $document = env('CLOUD_STORAGE_DOCUMENT_EXTENSION', 'pdf,doc,docx,txt,xls,xlsx,ppt,pptx,zip,rar,7z,psd');
+        $document = strtolower($document);
+        $video = env('CLOUD_STORAGE_VIDEO_EXTENSION', 'mp4,avi,rmvb,rm,mov,flv,3gp,wmv,asf,asx,mpg,mpeg,mpe,ts,divx,webm,mkv,vob');
+        $video = strtolower($video);
+        $audio = env('CLOUD_STORAGE_AUDIO_EXTENSION', 'mp3,wav,wma,ogg,ape,flac,aac');
+        $audio = strtolower($audio);
+        $image = env('CLOUD_STORAGE_IMAGE_EXTENSION', 'jpg,jpeg,png,gif,bmp,webp,tiff,svg,ico');
+        $image = strtolower($image);
+        if (strpos($document, $ext) !== false) {
             $format = 'document';
-        } elseif (strpos(env('CLOUD_STORAGE_VIDEO_EXTENSION'), $ext) !== false) {
+        } elseif (strpos($video, $ext) !== false) {
             $format = 'video';
-        } elseif (strpos(env('CLOUD_STORAGE_AUDIO_EXTENSION'), $ext) !== false) {
+        } elseif (strpos($audio, $ext) !== false) {
             $format = 'audio';
-        } elseif (strpos(env('CLOUD_STORAGE_IMAGE_EXTENSION'), $ext) !== false) {
+        } elseif (strpos($image, $ext) !== false) {
             $format = 'image';
         } else {
             $format = 'other';
@@ -65,5 +73,43 @@ if (! function_exists('getFileName')) {
         $arr = explode('/', $fileName);
 
         return end($arr);
+    }
+}
+
+/**
+ * 获取文件后缀及文件名
+ */
+if (! function_exists('getFilenameAndExtension')) {
+    function getFilenameAndExtension($path): array
+    {
+        // Parse URL if it is a URL
+        $parsed = @parse_url($path);
+        if ($parsed !== false && isset($parsed['path'])) {
+            $filePath = $parsed['path'];
+        } else {
+            $filePath = $path;
+        }
+
+        // Get the filename
+        $fileName = basename($filePath);
+
+        // Find the position of the last dot
+        $lastDot = strrpos($fileName, '.');
+
+        // Determine extension and filename
+        if ($lastDot === false || $lastDot === 0 || $lastDot === strlen($fileName) - 1) {
+            // No extension
+            $extension = '';
+            $filenameWithoutExtension = $fileName;
+        } else {
+            // Has extension
+            $extension = substr($fileName, $lastDot + 1);
+            $filenameWithoutExtension = substr($fileName, 0, $lastDot);
+        }
+
+        return [
+            'filename' => $filenameWithoutExtension,
+            'extension' => $extension,
+        ];
     }
 }

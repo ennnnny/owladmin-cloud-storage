@@ -47,7 +47,7 @@ class CloudStorageController extends BaseController
             ->columns([
                 amis()->TableColumn('id', 'ID')->sortable(),
                 amis()->TableColumn('title', cloud_storage_trans('title')),
-                amis()->TableColumn('driver', cloud_storage_trans('driver')),
+                amis()->TableColumn('driver_str', cloud_storage_trans('driver')),
                 amis()->TableColumn('description', cloud_storage_trans('description')),
                 amis()->TableColumn('sort', cloud_storage_trans('sort')),
                 amis()->SwitchControl('is_default', cloud_storage_trans('is_default'))->onText(__('admin.yes'))
@@ -63,7 +63,7 @@ class CloudStorageController extends BaseController
                 amis()->TableColumn('updated_at', __('admin.updated_at'))->set('type', 'datetime'),
                 $this->rowActions([
                     $this->rowEditButton(true),
-                    $this->rowDeleteButton(true),
+                    $this->rowDeleteButton(),
                 ]),
             ]);
 
@@ -108,7 +108,8 @@ class CloudStorageController extends BaseController
             //                amis()->TextControl('config.domain',  cloud_storage_trans('domain')),
             //            ]),
             amis()->Page()->className(['m-3']),
-            amis()->NumberControl('file_size', cloud_storage_trans('file_size'))->desc(cloud_storage_trans('file_size_desc')),
+            amis()->NumberControl('file_size', cloud_storage_trans('file_size'))->min(0)
+                ->desc(cloud_storage_trans('file_size_desc')),
             amis()->TextareaControl('accept', cloud_storage_trans('accept'))->desc(cloud_storage_trans('accept_desc')),
             amis()->TextareaControl('description', cloud_storage_trans('description')),
             amis()->TextControl('sort', cloud_storage_trans('sort'))->value(1000),

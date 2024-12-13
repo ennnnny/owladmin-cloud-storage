@@ -28,7 +28,7 @@ composer require ennnnny/owladmin-cloud-storage
 ### 调用
 
 ```php
-use Slowlyo\CloudStorage\Traits\UploadPickerTrait;
+use Ennnnny\CloudStorage\Traits\UploadPickerTrait;
 class CloudResourceController extends BaseController
 {
     use UploadPickerTrait;

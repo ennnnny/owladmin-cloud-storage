@@ -66,7 +66,7 @@ return [
     'throw' => '是否抛出异常',
     'keyword_file' => '请输入文件名',
     'file_size' => '文件大小',
-    'file_size_desc' => '默认限制10MB，-1不限制，单位MB',
+    'file_size_desc' => '默认限制10MB，0为不限制，单位MB',
     'accept' => '文件类型',
     'accept_desc' => '默认：.png,.jpg,.jpeg,.avi,.wmv,.mp4,.mov,.flv,.svi,.m4v,.pem',
     'no_default_storage_settings' => '无默认存储设置',
