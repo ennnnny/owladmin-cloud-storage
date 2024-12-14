@@ -67,16 +67,15 @@ class CloudUploadService
             //文件限制大小  更换最后的数字调整文件上传的大小
             $this->getSize($file, $id);
             $fileName = $file->getClientOriginalName();
-            // 判断是否已存在
-            $file_res = getFilenameAndExtension($fileName);
-            $is_exits = CloudResourceService::make()->query()->where('title', $file_res['filename'])->exists();
-            if ($is_exits) {
-                throw new \Exception('文件名已存在');
-            }
             $size = $file->getSize();
             // 配置信息
             $config = $this->config($id);
             $object = $this->generateFileName($fileName, $config->config);
+            // 判断是否已存在
+            $is_exits = CloudResourceService::make()->query()->where('url', $object)->exists();
+            if ($is_exits) {
+                throw new \Exception('文件已存在');
+            }
             $filePath = $file->getRealPath();
             // 调用获取云存储服务
             $cloudStorageFactory = CloudStorageFactory::make($config);
@@ -101,15 +100,14 @@ class CloudUploadService
     {
         //第一步 ： 初始化一个分片上传事件，获取uploadId。
         $fileName = request()->name;
-        // 判断是否已存在
-        $file_res = getFilenameAndExtension($fileName);
-        $is_exits = CloudResourceService::make()->query()->where('title', $file_res['filename'])->exists();
-        if ($is_exits) {
-            throw new \Exception('文件名已存在');
-        }
         // 配置信息
         $config = $this->config($id);
         $object = $this->generateFileName($fileName, $config->config);
+        // 判断是否已存在
+        $is_exits = CloudResourceService::make()->query()->where('url', $object)->exists();
+        if ($is_exits) {
+            throw new \Exception('文件已存在');
+        }
         // 调用获取云存储服务
         $cloudStorageFactory = CloudStorageFactory::make($config);
         $uploadId = $cloudStorageFactory->startChunk($object);
@@ -183,11 +181,11 @@ class CloudUploadService
      *
      * @throws \Exception
      */
-    public function signUrl(string $path): string
+    public function signUrl(string $path, $id = null): string
     {
         try {
             // 配置信息
-            $config = $this->config();
+            $config = $this->config($id);
             // 调用获取云存储服务
             $cloudStorageFactory = CloudStorageFactory::make($config);
 

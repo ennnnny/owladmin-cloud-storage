@@ -299,8 +299,29 @@ class CloudResourceController extends BaseController
                             'actions' => [],
                         ])->reload('window'),
                     amis()->TextControl()->name('text')->size('lg')->className('card-group-page-left-search')->labelWidth('0px')->mode('horizontal')->addOn(
-                        amis()->VanillaAction()->actionType('submit')
-                            ->icon('fas fa-search')->label(cloud_storage_trans('query'))->level('primary')
+                        amis()->Button()->label(cloud_storage_trans('query'))->level('primary')
+                            ->icon('fas fa-search')->onEvent([
+                                'click' => [
+                                    'actions' => [
+                                        [
+                                            'componentId' => 'table_list',
+                                            'actionType' => 'reload',
+                                            'data' => [
+                                                'keyword' => '${text}',
+                                                'is_type' => '${is_type}',
+                                            ],
+                                        ],
+                                        [
+                                            'componentId' => 'card_list',
+                                            'actionType' => 'reload',
+                                            'data' => [
+                                                'keyword' => '${text}',
+                                                'is_type' => '${is_type}',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ])
                     )->placeholder(cloud_storage_trans('keyword_file')),
                 ]),
             ]),
@@ -329,7 +350,8 @@ class CloudResourceController extends BaseController
             ->perPage(20)
             ->affixHeader(false)
             ->filterTogglable()
-            ->filterDefaultVisible(true)
+            ->id('table_list')
+            ->filterDefaultVisible(1)
             ->api($this->getResourceListPath())
             ->bulkActions([$this->bulkDeleteButton()])
             ->perPageAvailable([10, 20, 30, 50, 100, 200])
@@ -358,7 +380,8 @@ class CloudResourceController extends BaseController
             ->perPage(40)
             ->affixHeader(false)
             ->filterTogglable()
-            ->filterDefaultVisible(true)
+            ->id('card_list')
+            ->filterDefaultVisible(1)
             ->api($this->getResourceListPath())
             ->bulkActions([$this->bulkDeleteButton()])
             ->set('columnsCount', 8)

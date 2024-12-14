@@ -5,6 +5,7 @@ namespace Ennnnny\CloudStorage\Models;
 use Ennnnny\CloudStorage\Services\CloudResourceService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CloudResource extends Base
 {
@@ -26,6 +27,17 @@ class CloudResource extends Base
         });
     }
 
+    //    public function url(): Attribute
+    //    {
+    //        return Attribute::make(
+    //            get: fn ($value) => $value ? [
+    //                'path' => $value,
+    //                'value' => $this->getCloudStoragePath($value),
+    //            ] : [],
+    //            set: fn ($value) => $value
+    //        );
+    //    }
+
     public function size(): Attribute
     {
         return new Attribute(
@@ -42,5 +54,10 @@ class CloudResource extends Base
             get: fn ($value) => $value ? $cloudResourceService::fileType[$value] : 0,
             set: fn ($value) => $value,
         );
+    }
+
+    public function storage(): HasOne
+    {
+        return $this->hasOne(CloudStorage::class, 'id', 'storage_id');
     }
 }

@@ -64,6 +64,15 @@ class CloudResourceService extends AdminService
             ->orderBy('id', 'desc');
 
         $items = (clone $query)->paginate(request()->input('perPage', 40))->items();
+        foreach ($items as &$item) {
+            if (filled($item)) {
+                $url = $item->url;
+                $item->url = $url ? [
+                    'path' => $url,
+                    'value' => $item->getCloudStoragePath($url, $item->id),
+                ] : [];
+            }
+        }
         $total = (clone $query)->count();
 
         return compact('items', 'total');

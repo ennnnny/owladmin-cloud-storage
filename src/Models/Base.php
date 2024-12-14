@@ -25,26 +25,15 @@ class Base extends Model
         );
     }
 
-    public function url(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? [
-                'path' => $value,
-                'value' => $this->getCloudStoragePath($value),
-            ] : [],
-            set: fn ($value) => $value
-        );
-    }
-
     /**
      * 获取加密链接
      *
      * @throws \Exception
      */
-    public function getCloudStoragePath($value): string
+    public function getCloudStoragePath($value, $id = null): string
     {
         $cloudUploadService = new CloudUploadService;
 
-        return $cloudUploadService->signUrl($value);
+        return $cloudUploadService->signUrl($value, $id);
     }
 }
