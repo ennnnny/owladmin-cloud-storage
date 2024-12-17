@@ -20,10 +20,18 @@ class CloudResource extends Base
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->created_user = admin_user()->id;
+            if (admin_user()) {
+                $model->created_user = admin_user()->id;
+            } else {
+                $model->created_user = 0;
+            }
         });
         static::deleting(function ($model) {
-            $model->deleted_user = admin_user()->id;
+            if (admin_user()) {
+                $model->deleted_user = admin_user()->id;
+            } else {
+                $model->deleted_user = 0;
+            }
         });
     }
 
