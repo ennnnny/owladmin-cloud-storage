@@ -29,7 +29,7 @@ composer require ennnnny/owladmin-cloud-storage
 
 ### 调用
 
-form表单中调用
+选项组件，在form表单中调用
 ```php
 use Ennnnny\CloudStorage\Traits\UploadPickerTrait;
 class CloudResourceController extends BaseController
