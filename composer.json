@@ -3,7 +3,7 @@
     "alias": "云存储管理",
     "description": "支持 本地，腾讯云、阿里云等OSS云存储功能，支持一键迁移，资源展示等功能。",
     "type": "library",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "keywords": ["owl-admin", "extension", "oss"],
     "homepage": "https://github.com/ennnnny/owladmin-cloud-storage",
     "license": "MIT",
